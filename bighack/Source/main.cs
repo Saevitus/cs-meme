@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using SteamKit2;
+using SteamKit2.Internal;
 
 namespace programMain
 {
@@ -120,9 +121,17 @@ namespace programMain
 
         static void OnAccountInfo(SteamUser.AccountInfoCallback callback)
         {
-            
+
+            var stateMsg = new ClientMsgProtobuf<CMsgClientChangeStatus>(EMsg.ClientChangeStatus);
+            stateMsg.SourceJobID = steamClient.GetNextJobID();
+
+            stateMsg.Body.persona_state = (uint)1;
+            stateMsg.Body.persona_state_flags = (uint)4;
+
             string meme = friends.GetPersonaName();
             Console.WriteLine("{0}", meme);
+
+            steamClient.Send(stateMsg);
         }
 
         static void Main(string[] args)
